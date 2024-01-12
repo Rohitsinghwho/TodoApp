@@ -21,8 +21,7 @@ and testing purposes.<br
 You must have installed Node.js, NPM(Node Package Manager), Git & Text Editor (
     VS Code/Sublime Text) in order to use this application.<br>
     ## Installation <br>
-    1. Clone or Download the Repository from Github: https://github.com/
-    Anurag096/TodoApp.git
+    1. Clone or Download the Repository from Github: https://github.com/Rohitsinghwho/TodoApp.git
     2. Open Terminal / CMD and navigate to the cloned folder.
     3. Run `npm install` command to install all dependencies required by the project.
     This will also automatically install node_modules folder containing packages listed
