@@ -10,7 +10,9 @@ This is a Simple Todo Application buit in React and Nodejs. In front end we have
 2. ReactJS - A JavaScript library for building user interfaces.
 3. MongoDB - A document database that stores data in JSON-like documents with optional schemas.
 4. Mongoose - A MongoDB object modeling tool designed to work in an asynchronous environment..  
-5. ESLint - A tool for identifying problematic patterns in JavaScript code.<br><
+5. ESLint - A tool for identifying problematic patterns in JavaScript code.<br>
+6. bcrypt - A Node js library to hash passwords by performing cryptographic operations
+7. JsonWebToken- A Node js library to authenticate the user by genrating token when accessing the app 
 
 
 ## Getting Started <br>
