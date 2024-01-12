@@ -10,18 +10,25 @@ const UserSchema= new Schema(
             lowercase:true,
             index:true,
         },
-        FullName:{
+        fullName:{
             type:String,
-            maxLength:50
+            default:""
         },
         email:{
             type:String,
+            default:""
         },
         password:{
             type: String,
             required:[true,"Password is Required"],
-            maxLength:8
+            minLength:[8,"Please Enter a password greater than 8"]
         },
+        AllNotes:[
+            {
+            type:Schema.Types.ObjectId,
+            ref:"Todo"
+            }
+        ],
         refreshToken:{
             type:String,
         }
