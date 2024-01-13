@@ -30,7 +30,7 @@ const UserSchema= new Schema(
         },
         AllNotes:[
             {
-            type:Schema.Types.ObjectId,
+            type:mongoose.Schema.Types.ObjectId,
             ref:"Todo"
             }
         ],
@@ -48,6 +48,7 @@ UserSchema.pre('save', async function(next){
     this.password= await bcrypt.hash(this.password,10);
     next();
 })
+
 UserSchema.methods.isPasswordCorrect= async function(password){
     return await  bcrypt.compare(password,this.password)
 }

@@ -14,8 +14,9 @@ app.use(cookieParser()) //to send and recive cookies
 
 //routes import
 import UserRoute from './routes/users.routes.js'
-
+import TodoRoute from './routes/todo.routes.js'
 
 //routes
 app.use("/api/v1/user",UserRoute);
+app.use("/api/v1/todo",TodoRoute)
 export {app}

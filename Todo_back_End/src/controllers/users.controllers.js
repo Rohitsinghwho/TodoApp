@@ -2,7 +2,7 @@ import {asyncHandler} from '../utils/AsyncHandler.js'
 import {apiError} from '../utils/ApiError.js'
 import { User } from '../models/users.models.js';
 import {apiResponse} from '../utils/ApiResponse.js'
-
+import { mongoose } from 'mongoose';
 
 const genrateAccessandRefreshToken=async(userId)=>{
    try {
@@ -18,6 +18,7 @@ const genrateAccessandRefreshToken=async(userId)=>{
      throw new apiError(501,"failed to genrate Tokens")
    }
 }
+
 const registerUser= asyncHandler(async(req,res)=>{
     //Todo register user
     const {username,email,password,fullName}=req.body;
@@ -136,7 +137,6 @@ const UpdateDetails= asyncHandler(async(req,res)=>{
     return res.status(200).json(new apiResponse(200,{},"Updated Details"))
 })
 
-
 const getUser= asyncHandler(async(req,res)=>{
     const user=await User.findById(req.user._id).select("-password -refreshToken");
     if(!user){
@@ -145,11 +145,59 @@ const getUser= asyncHandler(async(req,res)=>{
     return res.status(200).json(new apiResponse(200,user,"User fetched Successfully"))
 
 })
-const fetchAllNotes= asyncHandler(async(req,res)=>{
-    //Todo Fetch all notes and size of total notes of user
-})
 
-
+const fetchAllNotes = asyncHandler(async (req, res) => {
+    const { page = 1, limit = 10 } = req.query;
+  
+    try {
+      const userAggregate = await User.aggregate([
+        {
+          $match: {
+            _id: new mongoose.Types.ObjectId(req.user._id)
+          }
+        },
+        {
+          $lookup: {
+            from: 'todos', // Assuming your Note collection is named 'notes'
+            localField: 'AllNotes',
+            foreignField: '_id',
+            as: 'AllNotes'
+          }
+        },
+        {
+          $unwind: '$AllNotes' // Unwind the array, if needed
+        },
+        {
+          $skip: (page - 1) * limit
+        },
+        {
+          $limit: parseInt(limit)
+        },
+        {
+          $group: {
+            _id: '$_id',
+            AllNotes: { $push: '$AllNotes' },
+            totalNotes: { $sum: 1 }
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            AllNotes: 1,
+            totalNotes: 1
+          }
+        }
+      ]);
+  
+      // If you want to return the result as an array, you can use the spread operator
+      const [result] = userAggregate;
+      return res.status(200).json(new apiResponse(200, result, 'Notes Fetched'));
+    } catch (error) {
+      console.error(error);
+      throw new apiError(500, 'Internal Server Error');
+    }
+  });
+  
 export{
     registerUser,
     LoginUser,

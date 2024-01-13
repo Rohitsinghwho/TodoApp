@@ -1,4 +1,5 @@
 import mongoose,{Schema} from "mongoose";
+import { User } from "./users.models.js";
 const TodoSchema= new Schema(
     {
         title:{
@@ -9,6 +10,10 @@ const TodoSchema= new Schema(
         description:{
             type: String,
             default:""
+        },
+        createdBy:{
+            type:mongoose.Types.ObjectId,  //reference to User model
+            ref:'User'
         }
     },
     {
@@ -16,4 +21,33 @@ const TodoSchema= new Schema(
     }
     )
 
+    TodoSchema.post('save', async function (doc, next) {
+    try {
+        const user = await User.findByIdAndUpdate(
+          doc.createdBy,
+          { $addToSet: { AllNotes: doc._id } },
+          { new: true }
+        );
+        next();
+      } catch (error) {
+        console.error(error);
+        next(error);
+      }
+ });
+
+ TodoSchema.post('remove', async function (doc, next) {
+    try {
+        const user = await User.findByIdAndUpdate(
+            doc.createdBy,
+            { $pull: { AllNotes: doc._id } },
+            { new: true }
+          );
+          next();
+        
+    } catch (error) {
+        console.error(error);
+        next(error);   
+    }
+ });
+ 
 export const Todo= mongoose.model("Todo",TodoSchema);

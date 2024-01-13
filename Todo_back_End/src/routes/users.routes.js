@@ -5,6 +5,7 @@ import { registerUser
     deleteUser,
     UpdateDetails,
     getUser,
+    fetchAllNotes
 
 } from "../controllers/users.controllers.js";
 import { jwtVerity } from "../middlewares/auth.middlewares.js";
@@ -18,4 +19,5 @@ router.route("/logout").post(jwtVerity,LogoutUser)
 router.route("/delete").delete(jwtVerity,deleteUser)
 router.route("/updateDetails").patch(jwtVerity,UpdateDetails)
 router.route("/getUser").get(jwtVerity,getUser)
+router.route("/fetchAllNotes").get(jwtVerity,fetchAllNotes)
 export default router;
