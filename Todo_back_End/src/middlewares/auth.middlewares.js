@@ -1,7 +1,7 @@
 import { User } from "../models/users.models.js";
 import { apiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken"
 
 export const jwtVerity= asyncHandler(async(req,res,next)=>{
 
@@ -10,8 +10,9 @@ export const jwtVerity= asyncHandler(async(req,res,next)=>{
         if(!token){
             throw new apiError(404,"Token Not found")
         }
+        // console.log(token)
         const decoded=  jwt.verify(token,process.env.ACCESS_TOKEN_SECRET)
-        const user= await User.findById(decoded?._id).select("-password 'refreshToken")
+        const user= await User.findById(decoded?._id).select("-password -refreshToken")
         if (!user) {
             throw new apiError(404,"User Not found")
         }

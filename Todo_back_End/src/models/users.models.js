@@ -8,14 +8,19 @@ const UserSchema= new Schema(
             required:[true,"Username is required"],
             unique:true,
             lowercase:true,
+            trim:true,
             index:true,
         },
         fullName:{
             type:String,
+            required:[true,"full name is required"],
+            trim:true,
             default:""
         },
         email:{
             type:String,
+            required:[true,"email is required"],
+            trim:true,
             default:""
         },
         password:{
@@ -41,6 +46,7 @@ const UserSchema= new Schema(
 UserSchema.pre('save', async function(next){
     if(!this.isModified("password"))return next();
     this.password= await bcrypt.hash(this.password,10);
+    next();
 })
 UserSchema.methods.isPasswordCorrect= async function(password){
     return await  bcrypt.compare(password,this.password)
@@ -56,7 +62,7 @@ UserSchema.methods.genrateRefreshToken= function(){
       }
     ) 
 }
-UserSchema.methods.genrateAccessToken=async function(){
+UserSchema.methods.genrateAccessToken=function(){
     return jwt.sign(
         {
         _id:this._id,

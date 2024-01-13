@@ -33,10 +33,10 @@ const registerUser= asyncHandler(async(req,res)=>{
     }
 
     const user= await User.create({
-        username,
-        email:email?email:"",
+        username:username.toLowerCase(),
+        email,
         password,
-        fullName:fullName?fullName:username,
+        fullName,
     })
     if(!user){
         throw new apiError(500,"Internal Server Error cannot Create User");
@@ -60,11 +60,16 @@ const LoginUser= asyncHandler(async(req,res)=>{
         throw new apiError(400,"Incorrect Password")
     } 
     const {refreshToken,accessToken}= await genrateAccessandRefreshToken(user._id);
+    // console.log("refreshToken: ",refreshToken)
+    // console.log(accessToken)
     const options = {
         httpOnly: true,
         secure: true,
     };
     const LoggedInUser= await User.findById(user._id).select("-password -refreshToken")
+    if(!LoggedInUser){
+        throw new apiError(400,"LoggedIn User does not exist")
+    }
     return res.status(200).cookie("refreshToken",refreshToken,options).cookie("accessToken",accessToken,options).json(new apiResponse(
         200,{user:LoggedInUser,accessToken,refreshToken},"User LoggedIn Successfully"
     ))
@@ -73,17 +78,17 @@ const LoginUser= asyncHandler(async(req,res)=>{
 const LogoutUser= asyncHandler(async(req,res)=>{
     //Todo Logout user
 
-    const user=  User.findByIdAndUpdate(req.user?._id,
+    const createdUser=  await User.findByIdAndUpdate(req.user?._id,
         {
             $unset:{
-                refreshToken:1
+                refreshToken:true
             }
         },
         {
             new:true,
         }
         );
-    if(!user)
+    if(!createdUser)
     {
         throw new apiError(404,"User Not found during Logout")
     }
