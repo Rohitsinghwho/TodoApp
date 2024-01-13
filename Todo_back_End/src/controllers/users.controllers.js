@@ -104,12 +104,47 @@ const LogoutUser= asyncHandler(async(req,res)=>{
 
 const deleteUser=asyncHandler(async(req,res)=>{
     // Todo delete User
+    const user=await User.findById(req.user._id)
+    if(!user){
+        throw new apiError(400,"User Does not Exist")
+    }
+    await user.deleteOne(user);
+    return res.status(200).json(new apiResponse(200,{},"Account deleted Successfully"));
 })
 
 const UpdateDetails= asyncHandler(async(req,res)=>{
     //Todo Update user
+    const {fullName,email,password}=req.body;
+    if(!fullName&&!email&&!password){
+        throw new apiError(400,"Either of the fields are required");
+    }
+    const OldUser=await User.findById(req.user._id)
+    const user= await User.findByIdAndUpdate(req.user._id,
+        {
+            $set:{
+                fullName:fullName?fullName:OldUser.fullName,
+                email:email?email:OldUser.email,
+                password:password?password:OldUser.password
+            }
+        },
+        {
+            new:true,
+        })
+    if(!user){
+        throw new apiError(400,"Cannot Update User")
+    }
+    return res.status(200).json(new apiResponse(200,{},"Updated Details"))
 })
 
+
+const getUser= asyncHandler(async(req,res)=>{
+    const user=await User.findById(req.user._id).select("-password -refreshToken");
+    if(!user){
+        throw new apiError(404,"User not Found")
+    }
+    return res.status(200).json(new apiResponse(200,user,"User fetched Successfully"))
+
+})
 const fetchAllNotes= asyncHandler(async(req,res)=>{
     //Todo Fetch all notes and size of total notes of user
 })
@@ -121,5 +156,6 @@ export{
     LogoutUser,
     deleteUser,
     UpdateDetails,
+    getUser,
     fetchAllNotes
 }
